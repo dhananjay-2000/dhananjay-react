@@ -28,6 +28,7 @@ function App() {
 
     <BussinessLogicWrapper>
       <Router>
+        <Toaster />
         <Routes>
           <Route path="/" element={<Navigate to="/tasks" />} />
           <Route path="/tasks" element={<TaskList />} />

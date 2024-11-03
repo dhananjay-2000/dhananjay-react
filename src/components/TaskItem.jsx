@@ -1,6 +1,5 @@
 import { BussinessLogicContext } from "../store/bussiness-logic";
 import { useContext } from "react";
-import "./TaskItem.css";
 const TaskItem = ({ task }) => {
 
     const { deleteTask, updateTask, toggleTaskCompletion } = useContext(BussinessLogicContext);
@@ -11,10 +10,6 @@ const TaskItem = ({ task }) => {
         String(currentDate.getDate()).padStart(2, "0"),
     ].join("-");
     const isOverdue = (task.dueDate) < formattedCurrentDate && !task.completed;
-
-    console.log("Task Due Date:", task.dueDate);
-    console.log("Current Date:", formattedCurrentDate);
-    console.log("Is Overdue:", isOverdue);
 
     return (
         <>
@@ -42,6 +37,7 @@ const TaskItem = ({ task }) => {
                     <button
                         className={`btn btn-sm ${task.completed ? "btn-warning" : "btn-success"}`}
                         onClick={() => toggleTaskCompletion(task.id)}
+                        disabled={isOverdue}
                     >
                         {task.completed ? "Mark Incomplete" : "Mark Complete"}
                     </button>

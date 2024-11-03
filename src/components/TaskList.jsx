@@ -1,5 +1,5 @@
 import TaskItem from "./TaskItem";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { BussinessLogicContext } from "../store/bussiness-logic";
 import TaskEmptyMessage from "./TaskEmptyMessage";
 import TaskFilter from "./TaskFilter";
@@ -9,19 +9,36 @@ import toast from "react-hot-toast";
 
 const TaskList = () => {
   const { addTasks, setFilter, setSortBy, sortedTasks } = useContext(BussinessLogicContext);
-
+  const [notifiedTasks, setNotifiedTasks] = useState(new Set());
 
   useEffect(() => {
-    const today = new Date().toISOString().split("T")[0];
+    const currentDate = new Date();
+    const formattedCurrentDate = [
+      currentDate.getFullYear(),
+      String(currentDate.getMonth() + 1).padStart(2, '0'),
+      String(currentDate.getDate()).padStart(2, '0'),
+    ].join('-');
 
-    // Iterate over tasks and trigger a notification for each task due today
-    addTasks.forEach((task) => {
-      if (task.dueDate === today && !task.notified) {
-        toast(`Task "${task.name}" is due today!`);
-        task.notified = true; // Mark task as notified to avoid duplicate notifications
+    // Check for tasks with a due date matching the current date
+    const dueTasks = sortedTasks.filter(task => task.dueDate === formattedCurrentDate);
+
+    // Show a notification for each task due today if it hasn't been notified yet
+    dueTasks.forEach(task => {
+      if (!notifiedTasks.has(task.id)) {
+        toast(`Reminder: Task "${task.name}" is due today!`, {
+          duration: 6000, // Duration for the notification
+          icon: '📅',
+        });
+        // Add the task ID to the notified set
+        notifiedTasks.add(task.id);
       }
     });
-  }, [addTasks]);
+
+    // Update the notifiedTasks state to trigger a re-render
+    setNotifiedTasks(new Set(notifiedTasks)); // Force state update to refresh the component
+
+  }, [sortedTasks]); // Runs every time sortedTasks change
+
 
 
   return (
